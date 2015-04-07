@@ -29,6 +29,11 @@ bool LoginHandler::update_state(PacketBuffer& buffer) try {
 		case State::REQUEST_REALMS:
 			send_realm_list(buffer);
 			break;
+		case State::FILE_TRANSFER:
+			handle_patch(buffer);
+			break;
+		case State::SYSTEM_SURVEY_RESULT:
+			LOG_DEBUG(logger_) << "Unhandled survey result" << LOG_ASYNC;
 		case State::CLOSED:
 			return false;
 		default:
@@ -70,6 +75,25 @@ bool LoginHandler::update_state(std::shared_ptr<Action> action) try {
 	return false;
 }
 
+// todo
+void LoginHandler::handle_patch(const PacketBuffer& buffer) {
+	auto opcode = *static_cast<const protocol::ClientOpcodes*>(buffer.data());
+
+	switch(opcode) {
+		case protocol::ClientOpcodes::CMSG_TRANSFER_ACCEPT:
+		case protocol::ClientOpcodes::CMSG_TRANSFER_RESUME:
+			send_file(buffer);
+			break;
+		case protocol::ClientOpcodes::CMSG_TRANSFER_CANCEL:
+			LOG_DEBUG(logger_) << "Unhandled transfer cancel" << LOG_ASYNC;
+			break;
+		default:
+			LOG_DEBUG(logger_) << "Received packet out of sync" << LOG_ASYNC;
+	}
+
+	state_ = State::CLOSED;
+}
+
 void LoginHandler::process_challenge(const PacketBuffer& buffer) {
 	LOG_TRACE(logger_) << __func__ << LOG_ASYNC;
 
@@ -106,6 +130,7 @@ void LoginHandler::process_challenge(const PacketBuffer& buffer) {
 void LoginHandler::patch_client(const GameVersion& version) {
 	// don't know yet
 	//stream << std::uint8_t(0) << std::uint8_t(0) << protocol::RESULT::FAIL_VERSION_UPDATE;
+	//state_ = State::FILE_TRANSFER;
 	//write(packet);
 }
 
@@ -295,6 +320,20 @@ void LoginHandler::send_login_success(StoreSessionAction* action) {
 	on_send(resp);
 }
 
+void LoginHandler::send_login_survey_success(StoreSessionAction* action) {
+	LOG_TRACE(logger_) << __func__ << LOG_ASYNC;
+
+	auto resp = std::make_shared<Packet>();
+	PacketStream<Packet> stream(resp.get());
+
+	stream << protocol::ServerOpcodes::SMSG_LOGIN_PROOF;
+	stream << protocol::ResultCodes::SUCCESS_SURVEY;
+	stream << protocol::ServerOpcodes::SMSG_TRANSFER_INITIATE;
+	// todo - send survey.mpq
+
+	state_ = State::FILE_TRANSFER;
+}
+
 void LoginHandler::send_reconnect_proof(const PacketBuffer& buffer) {
 	LOG_TRACE(logger_) << __func__ << LOG_ASYNC;
 
@@ -350,11 +389,22 @@ void LoginHandler::send_realm_list(const PacketBuffer& buffer) {
 
 	stream.swap(header.get());
 
-	stream << protocol::ServerOpcodes::SMSG_REQUEST_REALM_LIST;
+	stream << protocol::ServerOpcodes::SMSG_SEND_REALM_LIST;
 	stream << std::uint16_t(body->size());
 	
 	on_send(header);
 	on_send(body);
+}
+
+void LoginHandler::send_file(const PacketBuffer& buffer) {
+	LOG_TRACE(logger_) << __func__ << LOG_ASYNC;
+
+	if(!check_opcode(buffer, protocol::ClientOpcodes::CMSG_TRANSFER_ACCEPT)
+		|| check_opcode(buffer, protocol::ClientOpcodes::CMSG_TRANSFER_RESUME)) {
+		throw std::runtime_error("Expected CMSG_TRANSFER_ACCEPT/RESUME");
+	}
+
+	// todo
 }
 
 bool LoginHandler::check_opcode(const PacketBuffer& buffer, protocol::ClientOpcodes opcode) {

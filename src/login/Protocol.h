@@ -21,7 +21,13 @@ enum class ClientOpcodes : std::uint8_t {
 	CMSG_LOGIN_PROOF,
 	CMSG_RECONNECT_CHALLENGE,
 	CMSG_RECONNECT_PROOF,
+	CMSG_SYSTEM_SURVEY_RESULT,
 	CMSG_REQUEST_REALM_LIST = 0x10,
+	CMSG_TRANSFER_INITIATE  = 0x30,
+	CMSG_TRANSFER_DATA,
+	CMSG_TRANSFER_ACCEPT,
+	CMSG_TRANSFER_RESUME,
+	CMSG_TRANSFER_CANCEL
 };
 
 enum class ServerOpcodes : std::uint8_t {
@@ -29,9 +35,12 @@ enum class ServerOpcodes : std::uint8_t {
 	SMSG_LOGIN_PROOF,
 	SMSG_RECONNECT_CHALLENGE,
 	SMSG_RECONNECT_PROOF,
-	SMSG_REQUEST_REALM_LIST   = 0x10,
+	SMSG_SEND_REALM_LIST      = 0x10,
 	SMSG_TRANSFER_INITIATE    = 0x30,
-	SMSG_TRANSFER_DATA
+	SMSG_TRANSFER_DATA,
+	SMSG_TRANSFER_ACCEPT,
+	SMSG_TRANSFER_RESUME,
+	SMSG_TRANSFER_CANCEL
 };
 
 enum class ResultCodes : std::uint8_t {
@@ -58,6 +67,19 @@ enum class ResultCodes : std::uint8_t {
 struct RequestRealmList {
 	ClientOpcodes opcode;
 	std::uint32_t unknown;
+};
+
+struct AcceptTransfer {
+	ClientOpcodes opcode;
+};
+
+struct CancelTransfer {
+	ClientOpcodes opcode;
+};
+
+struct ResumeTransfer {
+	ClientOpcodes opcode;
+	std::uint64_t offset;
 };
 
 struct ClientLoginProof {

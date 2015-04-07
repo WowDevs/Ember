@@ -28,8 +28,9 @@ class Patcher;
 
 class LoginHandler {
 	enum class State {
-		INITIAL_CHALLENGE, LOGIN_PROOF, RECONNECT_PROOF, REQUEST_REALMS,
-		FETCHING_USER, FETCHING_SESSION, WRITING_SESSION, CLOSED
+		INITIAL_CHALLENGE, LOGIN_PROOF, RECONNECT_PROOF, SYSTEM_SURVEY_RESULT,
+		FILE_TRANSFER, REQUEST_REALMS, FETCHING_USER, FETCHING_SESSION,
+		WRITING_SESSION, CLOSED
 	};
 
 	State state_ = State::INITIAL_CHALLENGE;
@@ -47,10 +48,13 @@ class LoginHandler {
 	void process_challenge(const PacketBuffer& buffer);
 	void check_login_proof(PacketBuffer& buffer);
 	void send_reconnect_proof(const PacketBuffer& buffer);
-	void send_login_failure(protocol::ResultCodes result);
 	void build_login_challenge(PacketStream<Packet>& resp);
 	void send_login_challenge(FetchUserAction* action);
+	void send_login_failure(protocol::ResultCodes result);
 	void send_login_success(StoreSessionAction* action);
+	void send_login_survey_success(StoreSessionAction* action);
+	void send_file(const PacketBuffer& buffer);
+	void LoginHandler::handle_patch(const PacketBuffer& buffer);
 	void send_reconnect_challenge(FetchSessionKeyAction* action);
 
 	void accept_client(protocol::ClientOpcodes opcode);

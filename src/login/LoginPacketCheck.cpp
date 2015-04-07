@@ -72,7 +72,14 @@ bool check_packet_completion(const PacketBuffer& buffer) {
 			return buffer.size() >= sizeof(protocol::ClientReconnectProof);
 		case protocol::ClientOpcodes::CMSG_REQUEST_REALM_LIST:
 			return buffer.size() >= sizeof(protocol::RequestRealmList);
+		case protocol::ClientOpcodes::CMSG_TRANSFER_ACCEPT:
+			return buffer.size() >= sizeof(protocol::AcceptTransfer);
+		case protocol::ClientOpcodes::CMSG_TRANSFER_RESUME:
+			return buffer.size() >= sizeof(protocol::ResumeTransfer);
+		case protocol::ClientOpcodes::CMSG_TRANSFER_CANCEL:
+			return buffer.size() >= sizeof(protocol::CancelTransfer);
 		default:
+			LOG_TRACE_GLOB << "Unhandled opcode: " << static_cast<std::uint8_t>(opcode) << LOG_ASYNC;
 			throw std::runtime_error("Unhandled opcode");
 	}
 }
