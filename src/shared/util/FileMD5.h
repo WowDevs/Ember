@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
+#include <string>
 
-namespace ember { namespace spark {
+namespace Botan { class BigInt; }
 
-class Server {
-public:
-};
+namespace ember { namespace util {
 
-}} // spark, ember
+Botan::BigInt generate_md5(const std::string& file);
+
+}} // util, ember

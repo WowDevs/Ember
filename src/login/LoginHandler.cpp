@@ -127,6 +127,10 @@ void LoginHandler::process_challenge(const PacketBuffer& buffer) {
 	}
 }
 
+void LoginHandler::initiate_file_transfer() {
+
+}
+
 void LoginHandler::patch_client(const GameVersion& version) {
 	// don't know yet
 	//stream << std::uint8_t(0) << std::uint8_t(0) << protocol::RESULT::FAIL_VERSION_UPDATE;

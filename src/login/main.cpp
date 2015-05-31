@@ -15,6 +15,7 @@
 #include "RealmList.h"
 #include "RealmHandler.h"
 #include "RealmPacketCheck.h"
+#include "PatchCache.h"
 #include <logger/Logging.h>
 #include <conpool/ConnectionPool.h>
 #include <conpool/Policies.h>
@@ -107,14 +108,20 @@ void launch(const po::variables_map& args, el::Logger* logger) try {
 	LOG_INFO(logger) << "Starting thread pool with " << concurrency << " threads..." << LOG_SYNC;
 	ember::ThreadPool thread_pool(concurrency);
 
+	LOG_INFO(logger) << "Initialising patch cache..." << LOG_SYNC;
 	const auto allowed_clients = client_versions();
-	ember::Patcher patcher(allowed_clients, "temp");
-	ember::LoginHandlerBuilder builder(logger, patcher, *user_dao, realm_list);
-	ba::io_service service(concurrency);
+	ember::Patcher patcher(allowed_clients, ember::patch_cache::fetch("patches"));
+	
+	if(args["survey.enabled"].as<bool>()) {
+
+	}
 
 	// Start login server
 	auto interface = args["network.interface"].as<std::string>();
 	auto port = args["network.port"].as<unsigned short>();
+	ember::LoginHandlerBuilder builder(logger, patcher, *user_dao, realm_list);
+
+	ba::io_service service(concurrency);
 
 	LOG_INFO(logger) << "Binding server to " << interface << ":" << port << LOG_SYNC;
 	ember::NetworkHandler<ember::LoginHandler> login_server(service, port, interface,

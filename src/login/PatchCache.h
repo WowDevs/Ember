@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
+#include "PatchMeta.h"
+#include <vector>
+#include <string>
 
-namespace ember { namespace spark {
+namespace ember { namespace patch_cache {
 
-class Server {
-public:
-};
+std::vector<PatchMeta> fetch(const std::string& path);
 
-}} // spark, ember
+}} // patch_cache, ember

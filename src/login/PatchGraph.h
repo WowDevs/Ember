@@ -8,10 +8,15 @@
 
 #pragma once
 
-namespace ember { namespace spark {
+#include "PatchMeta.h"
+#include <vector>
 
-class Server {
+namespace ember {
+
+class PatchGraph {
+	
 public:
+	PatchGraph(std::vector<PatchMeta> patches);
 };
 
-}} // spark, ember
+} // ember

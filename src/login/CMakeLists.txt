@@ -15,6 +15,7 @@ set(EXECUTABLE_HDR
     ../shared/misc/PacketStream.h
     ../shared/threading/ThreadPool.h
     ../shared/util/LogConfig.h
+    ../shared/util/FileMD5.h
     LoginHandlerBuilder.h
     LoginPacketCheck.h
     RealmPacketCheck.h
@@ -22,6 +23,7 @@ set(EXECUTABLE_HDR
     LoginHandler.h
     RealmHandler.h
     PacketBuffer.h
+    PatchMeta.h
     Handler.h
     Session.h
     Protocol.h
@@ -30,12 +32,15 @@ set(EXECUTABLE_HDR
     RealmList.h
     Actions.h
     Patcher.h
+    PatchCache.h
+    PatchGraph.h
     )
 
 set(EXECUTABLE_SRC
     ../shared/threading/ThreadPool.cpp
     ../shared/Banner.cpp
     ../shared/util/LogConfig.cpp
+    ../shared/util/FileMD5.cpp
     LoginHandler.cpp
     LoginPacketCheck.cpp
     RealmPacketCheck.cpp
@@ -43,6 +48,8 @@ set(EXECUTABLE_SRC
     RealmList.cpp
     Authenticator.cpp
     Patcher.cpp
+    PatchCache.cpp
+    PatchGraph.cpp
     main.cpp
     )
 

@@ -74,4 +74,4 @@ inline bool operator>=(const GameVersion& lhs, const GameVersion& rhs) {
 	return (lhs > rhs || lhs == rhs);
 }
 
-} //ember
+} // ember

@@ -44,6 +44,7 @@ class LoginHandler {
 	std::unique_ptr<LoginAuthenticator> login_auth_;
 	std::unique_ptr<ReconnectAuthenticator> reconn_auth_;
 
+	void initiate_file_transfer();
 	void send_realm_list(const PacketBuffer& buffer);
 	void process_challenge(const PacketBuffer& buffer);
 	void check_login_proof(PacketBuffer& buffer);

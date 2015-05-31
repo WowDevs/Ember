@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
+#include "PatchGraph.h"
 
-namespace ember { namespace spark {
+namespace ember {
 
-class Server {
-public:
-};
+//PatchGraph::PatchGraph(std::vector<PatchMeta> patches) : patches_(std::move(patches)) {
+//
+//}
 
-}} // spark, ember
+} // ember
