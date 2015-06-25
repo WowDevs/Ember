@@ -6,18 +6,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
-
-#include <spark/RouteConfig.h>
+#include <spark/Types.h>
+#include <string>
 
 namespace ember { namespace spark {
 
-class Server {
-	RouteConfig route_config_;
+class Link {
+	const std::string name_;
+	const ServerID server_id_;
 
 public:
-	RouteConfig& route_config() {
-		return route_config_;
+	Link(std::string name) : name_(std::move(name)), server_id_(5) {}
+
+	std::string who() {
+		return name_;
 	}
 };
 

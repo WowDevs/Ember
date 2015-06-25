@@ -8,17 +8,10 @@
 
 #pragma once
 
-#include <spark/RouteConfig.h>
-
 namespace ember { namespace spark {
 
-class Server {
-	RouteConfig route_config_;
-
-public:
-	RouteConfig& route_config() {
-		return route_config_;
-	}
+enum class Result {
+	OK, DEST_NOT_FOUND
 };
 
 }} // spark, ember

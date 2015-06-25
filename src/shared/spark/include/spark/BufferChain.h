@@ -8,17 +8,11 @@
 
 #pragma once
 
-#include <spark/RouteConfig.h>
-
 namespace ember { namespace spark {
 
-class Server {
-	RouteConfig route_config_;
-
+class BufferChain {
 public:
-	RouteConfig& route_config() {
-		return route_config_;
-	}
+	
 };
 
 }} // spark, ember

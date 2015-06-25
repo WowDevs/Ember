@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include <spark/RouteConfig.h>
+#include <spark/Server.h>
 
-namespace ember { namespace spark {
+namespace ember {
 
-class Server {
-	RouteConfig route_config_;
+class TestService {
+	spark::Server& server_;
+
+	void configure();
 
 public:
-	RouteConfig& route_config() {
-		return route_config_;
-	}
+	TestService(spark::Server& server);
 };
 
-}} // spark, ember
+} // ember

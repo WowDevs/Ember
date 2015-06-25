@@ -8,17 +8,15 @@
 
 #pragma once
 
-#include <spark/RouteConfig.h>
-
 namespace ember { namespace spark {
 
-class Server {
-	RouteConfig route_config_;
-
+class RouteConfig {
 public:
-	RouteConfig& route_config() {
-		return route_config_;
-	}
+	template<typename Protocol>
+	void configure_inbound(){}
+
+	template<typename Protocol>
+	void configure_outbound();
 };
 
 }} // spark, ember

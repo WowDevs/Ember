@@ -1,0 +1,1 @@
+This is a throwaway testing ground for development of the project's networking layer.

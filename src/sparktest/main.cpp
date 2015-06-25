@@ -6,19 +6,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
+#include "TestService.h"
+#include <spark/Server.h>
+#include <iostream>
 
-#include <spark/RouteConfig.h>
+using namespace ember;
 
-namespace ember { namespace spark {
+void launch();
 
-class Server {
-	RouteConfig route_config_;
+int main() {
+	launch();
+}
 
-public:
-	RouteConfig& route_config() {
-		return route_config_;
-	}
-};
+void launch() {
+	spark::Server server;
+	TestService test_service(server);
 
-}} // spark, ember
+	
+}

@@ -1,0 +1,8 @@
+protocol grunt;
+
+include "shared.spark";
+
+message RequestRealmList {
+	ClientOpcode opcode;
+	uint32 unknown;
+}

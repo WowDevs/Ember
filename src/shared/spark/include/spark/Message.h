@@ -8,16 +8,16 @@
 
 #pragma once
 
-#include <spark/RouteConfig.h>
+#include <cstdint>
 
 namespace ember { namespace spark {
 
-class Server {
-	RouteConfig route_config_;
+class Message {
+	std::uint16_t code_ = 5;
 
 public:
-	RouteConfig& route_config() {
-		return route_config_;
+	std::uint16_t code() {
+		return code_;
 	}
 };
 

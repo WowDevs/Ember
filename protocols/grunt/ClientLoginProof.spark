@@ -1,0 +1,12 @@
+protocol grunt;
+
+include "shared.spark";
+
+message ClientLoginProof {
+	ClientOpcode opcode;
+	uint8 A[32];
+	uint8 M1[20];
+	uint8 crc_hash[20];
+	uint8 key_count;
+	uint8 unknown;
+}

@@ -1,0 +1,21 @@
+protocol grunt;
+
+include "shared.spark";
+
+message ClientLoginChallenge {
+	ClientOpcode opcode;
+	ResultCodes errors;
+	uint16 size;
+	uint8 game[4];
+	uint8 major;
+	uint8 minor;
+	uint8 patch;
+	uint16 build;
+	uint8 platform[4];
+	uint8 os[4];
+	uint8 country[4];
+	uint32 timezone_bias;
+	uint32 ip;
+	uint8 username_len;
+	end_string username;
+}

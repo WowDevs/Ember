@@ -7,7 +7,16 @@
 add_library(spark
             src/Server.cpp
             include/spark/Server.h
-
+            include/spark/Handler.h
+            include/spark/Link.h
+            include/spark/Message.h
+            include/spark/Result.h
+            include/spark/RouteConfig.h
+            include/spark/Types.h
+            include/spark/BufferChain.h
+            src/BufferChain.cpp
+            include/spark/BufferChainNode.h
+            src/BufferChainNode.cpp
 )
 
 target_include_directories(spark PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

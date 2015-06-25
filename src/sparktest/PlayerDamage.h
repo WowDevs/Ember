@@ -6,19 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
+#include <spark/Message.h>
+#include <spark/Types.h>
+#include <cstdint>
 
-#include <spark/RouteConfig.h>
+namespace ember {
 
-namespace ember { namespace spark {
-
-class Server {
-	RouteConfig route_config_;
-
-public:
-	RouteConfig& route_config() {
-		return route_config_;
-	}
+struct PlayerDamage : spark::Message {
+	std::uint16_t amount = 10;
 };
 
-}} // spark, ember
+} // ember

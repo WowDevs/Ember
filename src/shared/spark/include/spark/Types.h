@@ -6,19 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma once
-
-#include <spark/RouteConfig.h>
+#include <cstdint>
 
 namespace ember { namespace spark {
 
-class Server {
-	RouteConfig route_config_;
-
-public:
-	RouteConfig& route_config() {
-		return route_config_;
-	}
-};
+typedef std::uint32_t ServerID; // temp
+typedef std::uint32_t ObjectID; // temp
+typedef std::uint32_t ServiceType; // temp
+//typedef std::uint32_t Message; // temp
 
 }} // spark, ember
