@@ -10,10 +10,10 @@
 
 #include <spark/BufferChainNode.h>
 #include <boost/assert.hpp>
-#include <cstddef>
 #include <iostream>
 #include <vector>
 #include <utility>
+#include <cstddef>
 
 namespace ember { namespace spark {
 
@@ -29,10 +29,6 @@ class BufferChain {
 		node->next = &root_;
 		node->prev = root_.prev;
 		root_.prev = root_.prev->next = node;
-	}
-
-	void allocate_tail_node() {
-
 	}
 
 	void unlink_node(BufferChainNode* node) {
@@ -71,6 +67,7 @@ public:
 
 			if(remaining) {
 				unlink_node(root_.next);
+				deallocate(node);
 			}
 		}
 
@@ -118,6 +115,7 @@ public:
 
 			if(length) {
 				unlink_node(head);
+				deallocate(node);
 			}
 		}
 	}
@@ -128,7 +126,7 @@ public:
 
 		while(remaining) {
 			if(tail == &root_) {
-				Buffer<BlockSize>* buffer = new Buffer<BlockSize>();
+				Buffer<BlockSize>* buffer = allocate_buffer();
 				link_tail_node(&buffer->node);
 				tail = root_.prev;
 			}
@@ -151,6 +149,14 @@ public:
 
 	void attach(Buffer<BlockSize>* buffer) {
 		link_tail_node(buffer->node);
+	}
+
+	Buffer<BlockSize>* allocate() {
+		return new Buffer<BlockSize>(); // todo, actual allocator
+	}
+
+	void deallocate(Buffer<BlockSize>* buffer) {
+		delete buffer; // todo, actual allocator
 	}
 };
 
