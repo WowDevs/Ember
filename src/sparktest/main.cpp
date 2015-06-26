@@ -23,7 +23,7 @@ int main() {
 void launch() try {
 	spark::Server server;
 	TestService test_service(server);
-	spark::BufferChain<9999> chain;
+	spark::BufferChain<1023> chain;
 	
 	char bar = 'a';
 

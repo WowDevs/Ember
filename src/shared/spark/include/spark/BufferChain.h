@@ -53,7 +53,8 @@ public:
 		BufferChainNode* head;
 
 		while((head = root_.next) != &root_) {
-
+			unlink_node(head);
+			deallocate(buffer_from_node(head));
 		}
 	}
 
@@ -91,7 +92,7 @@ public:
 
 	std::vector<ConstRawBuffer> fetch_buffers(std::size_t length) {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer fetch too large!");
-		std::vector<RawBuffer> buffers;
+		std::vector<ConstRawBuffer> buffers;
 		auto head = root_.next;
 
 		while(length) {
@@ -126,7 +127,7 @@ public:
 
 		while(remaining) {
 			if(tail == &root_) {
-				Buffer<BlockSize>* buffer = allocate_buffer();
+				Buffer<BlockSize>* buffer = allocate();
 				link_tail_node(&buffer->node);
 				tail = root_.prev;
 			}
@@ -152,10 +153,12 @@ public:
 	}
 
 	Buffer<BlockSize>* allocate() {
+		std::cout << "Allocate\n";
 		return new Buffer<BlockSize>(); // todo, actual allocator
 	}
 
 	void deallocate(Buffer<BlockSize>* buffer) {
+		std::cout << "Deallocate\n";
 		delete buffer; // todo, actual allocator
 	}
 };
