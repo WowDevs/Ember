@@ -67,11 +67,11 @@ struct Buffer {
 	std::size_t reserve(std::size_t length) {
 		std::size_t reserve_len = BlockSize - write_offset;
 
-		if(write_len > length) {
-			write_len = length;
+		if(reserve_len > length) {
+			reserve_len = length;
 		}
 
-		write_offset += write_len;
+		write_offset += reserve_len;
 		return reserve_len;
 	}
 

@@ -89,9 +89,9 @@ public:
 		}
 	}
 
-	std::vector<ConstRawBuffer> fetch_buffers(std::size_t length) {
+	std::vector<RawBuffer> fetch_buffers(std::size_t length) {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer fetch too large!");
-		std::vector<ConstRawBuffer> buffers;
+		std::vector<RawBuffer> buffers;
 		auto head = root_.next;
 
 		while(length) {
@@ -107,17 +107,20 @@ public:
 
 	void skip(std::size_t length) {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer skip too large!");
+		std::size_t remaining = length;
 		auto head = root_.next;
 
-		while(length) {
+		while(remaining) {
 			auto buffer = buffer_from_node(head);
-			length -= buffer->size();
+			remaining -= buffer->size();
 
-			if(length) {
+			if(remaining) {
 				unlink_node(head);
 				deallocate(node);
 			}
 		}
+
+		size_ -= length;
 	}
 
 	void write(const char* source, std::size_t length) {
