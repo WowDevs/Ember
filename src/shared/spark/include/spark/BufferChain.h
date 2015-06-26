@@ -10,7 +10,6 @@
 
 #include <spark/BufferChainNode.h>
 #include <boost/assert.hpp>
-#include <iostream>
 #include <vector>
 #include <utility>
 #include <cstddef>
@@ -43,7 +42,7 @@ class BufferChain {
 	}
 	
 public:
-	BufferChain() {
+	BufferChain() { // todo - change in VS2015
 		root_.next = &root_;
 		root_.prev = &root_;
 		size_ = 0;
@@ -75,7 +74,7 @@ public:
 		size_ -= length;
 	}
 
-	void copy(const char* source, std::size_t length) {
+	void copy(const char* source, std::size_t length) const {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer copy too large!");
 		std::size_t remaining = length;
 		auto head = root_.next;
@@ -126,13 +125,16 @@ public:
 		BufferChainNode* tail = root_.prev;
 
 		while(remaining) {
+			Buffer<BlockSize>* buffer;
+
 			if(tail == &root_) {
-				Buffer<BlockSize>* buffer = allocate();
+				buffer = allocate();
 				link_tail_node(&buffer->node);
 				tail = root_.prev;
+			} else {
+				buffer = buffer_from_node(tail);
 			}
 
-			auto buffer = buffer_from_node(tail);
 			remaining -= buffer->write(source + length - remaining, remaining);
 			tail = tail->next;
 		}
@@ -140,7 +142,29 @@ public:
 		size_ += length;
 	}
 
-	std::size_t size() {
+	void reserve(std::size_t length) {
+		std::size_t remaining = length;
+		BufferChainNode* tail = root_.prev;
+
+		while(remaining) {
+			Buffer<BlockSize>* buffer;
+
+			if(tail == &root_) {
+				buffer = allocate();
+				link_tail_node(&buffer->node);
+				tail = root_.prev;
+			} else {
+				buffer = buffer_from_node(tail);
+			}
+
+			remaining -= buffer->reserve(remaining);
+			tail = tail->next;
+		}
+
+		size_ += length;
+	}
+
+	std::size_t size() const {
 		return size_;
 	}
 
@@ -152,13 +176,11 @@ public:
 		link_tail_node(buffer->node);
 	}
 
-	Buffer<BlockSize>* allocate() {
-		std::cout << "Allocate\n";
+	Buffer<BlockSize>* allocate() const {
 		return new Buffer<BlockSize>(); // todo, actual allocator
 	}
 
-	void deallocate(Buffer<BlockSize>* buffer) {
-		std::cout << "Deallocate\n";
+	void deallocate(Buffer<BlockSize>* buffer) const {
 		delete buffer; // todo, actual allocator
 	}
 };
