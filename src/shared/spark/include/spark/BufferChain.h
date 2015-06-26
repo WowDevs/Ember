@@ -13,6 +13,7 @@
 #include <vector>
 #include <utility>
 #include <cstddef>
+#include <iostream>
 
 namespace ember { namespace spark {
 
@@ -37,8 +38,36 @@ class BufferChain {
 		prev->next = next;
 	}
 
-	Buffer<BlockSize>* buffer_from_node(BufferChainNode* node) {
+	Buffer<BlockSize>* buffer_from_node(BufferChainNode* node) const {
 		return reinterpret_cast<Buffer<BlockSize>*>(std::size_t(node) - offsetof(Buffer<BlockSize>, node));
+	}
+
+	Buffer<BlockSize>* buffer_from_node(const BufferChainNode* node) const {
+		return reinterpret_cast<Buffer<BlockSize>*>(std::size_t(node) - offsetof(Buffer<BlockSize>, node));
+	}
+
+	void move(BufferChain& rhs) {
+		size_ = rhs.size_;
+		root_.next = rhs.root_.next;
+		root_.prev = rhs.root_.prev;
+		rhs.size_ = 0;
+		rhs.root_.next = &rhs.root_;
+		rhs.root_.prev = &rhs.root_;
+	}
+
+	void copy(const BufferChain& rhs) {
+		const BufferChainNode* head = rhs.root_.next;
+		root_.next = &root_;
+		root_.prev = &root_;
+		size_ = 0;
+
+		while(head != &rhs.root_) {
+			auto buffer = allocate();
+			*buffer = *buffer_from_node(head);
+			link_tail_node(&buffer->node);
+			size_ += buffer->write_offset;
+			head = head->next;
+		}
 	}
 	
 public:
@@ -57,6 +86,11 @@ public:
 		}
 	}
 
+	BufferChain& operator=(BufferChain&& rhs) { move(rhs); }
+	BufferChain(BufferChain&& rhs) { move(rhs); }
+	BufferChain(const BufferChain& rhs) { copy(rhs); }
+	BufferChain& operator=(const BufferChain& rhs) { copy(rhs); }
+
 	void read(char* destination, std::size_t length) {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer read too large!");
 		std::size_t remaining = length;
@@ -67,7 +101,7 @@ public:
 
 			if(remaining) {
 				unlink_node(root_.next);
-				deallocate(node);
+				deallocate(head);
 			}
 		}
 
@@ -97,8 +131,15 @@ public:
 		while(length) {
 			auto buffer = buffer_from_node(head);
 			auto size = buffer->size();
-			buffers.emplace_back(buffer->buff.data(), size);
+
+			// guard against overflow - buffer may have more content than requested
+			if(size > length) {
+				size = length;
+			}
+
+			buffers.emplace_back(buffer->buff.data() + buffer->read_offset, size);
 			length -= size;
+			std::cout << size << "\n";
 			head = head->next;
 		}
 
@@ -176,7 +217,7 @@ public:
 	}
 
 	void attach(Buffer<BlockSize>* buffer) {
-		link_tail_node(buffer->node);
+		link_tail_node(&buffer->node);
 	}
 
 	Buffer<BlockSize>* allocate() const {
