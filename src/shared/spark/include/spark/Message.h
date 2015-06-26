@@ -9,12 +9,13 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 
 namespace ember { namespace spark {
 
 class Message {
 	std::uint16_t code_ = 5;
-
+	std::size_t temp;
 public:
 	std::uint16_t code() {
 		return code_;

@@ -16,7 +16,7 @@ public:
 	void configure_inbound(){}
 
 	template<typename Protocol>
-	void configure_outbound();
+	void configure_outbound(){}
 };
 
 }} // spark, ember

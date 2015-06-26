@@ -14,9 +14,7 @@ add_library(spark
             include/spark/RouteConfig.h
             include/spark/Types.h
             include/spark/BufferChain.h
-            src/BufferChain.cpp
             include/spark/BufferChainNode.h
-            src/BufferChainNode.cpp
 )
 
 target_include_directories(spark PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

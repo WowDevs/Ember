@@ -7,8 +7,10 @@
  */
 
 #include "TestService.h"
+#include <spark/BufferChain.h>
 #include <spark/Server.h>
 #include <iostream>
+#include <string>
 
 using namespace ember;
 
@@ -18,9 +20,27 @@ int main() {
 	launch();
 }
 
-void launch() {
+void launch() try {
 	spark::Server server;
 	TestService test_service(server);
-
+	spark::BufferChain<9999> chain;
 	
+	char bar = 'a';
+
+	for(int i = 0; i < 1023; ++i) {
+		chain.write(&bar, sizeof(bar));
+	}
+
+	char test = 'b';
+	chain.write(&test, 1);
+
+	auto buffers = chain.fetch_buffers(1024);
+
+	for(auto& buffer : buffers) {
+		std::cout << std::string(buffer.first, buffer.second);
+	}
+
+	//std::cout << std::string(foo, 1024);
+} catch(std::exception& e) {
+	std::cout << e.what();
 }
