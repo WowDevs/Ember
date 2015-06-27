@@ -70,6 +70,18 @@ class BufferChain {
 		}
 	}
 	
+	void offset_buffers(std::vector<RawBuffer>& buffers, std::size_t offset) {
+		for(auto i = buffers.begin(); i != buffers.end();) {
+			if(i->second > offset) {
+				i->first += offset;
+				i->second -= offset;
+				break;
+			} else {
+				buffers.erase(i);
+			}
+		}
+	}
+
 public:
 	BufferChain() { // todo - change in VS2015
 		root_.next = &root_;
@@ -118,23 +130,28 @@ public:
 		}
 	}
 
-	std::vector<RawBuffer> fetch_buffers(std::size_t length) {
-		BOOST_ASSERT_MSG(length <= size_, "Chained buffer fetch too large!");
+	std::vector<RawBuffer> fetch_buffers(std::size_t length, std::size_t offset = 0) {
+		std::size_t total = length + offset;
+		BOOST_ASSERT_MSG(total <= size_, "Chained buffer fetch too large!");
 		std::vector<RawBuffer> buffers;
 		auto head = root_.next;
 
-		while(length) {
+		while(total) {
 			auto buffer = buffer_from_node(head);
 			std::size_t read_size = BlockSize - buffer->read_offset;
 			
 			// guard against overflow - buffer may have more content than requested
-			if(read_size > length) {
-				read_size = length;
+			if(read_size > total) {
+				read_size = total;
 			}
 		
 			buffers.emplace_back(buffer->buff.data() + buffer->read_offset, read_size);
-			length -= read_size;
+			total -= read_size;
 			head = head->next;
+		}
+
+		if(offset) {
+			offset_buffers(buffers, offset);
 		}
 
 		return buffers;
