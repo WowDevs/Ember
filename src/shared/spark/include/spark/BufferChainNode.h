@@ -45,7 +45,7 @@ struct Buffer {
 			read_len = length;
 		}
 
-		std::copy(buff.data(), buff.data() + read_len, destination);
+		std::copy(buff.data() + read_offset, buff.data() + read_offset + read_len, destination);
 		return read_len;
 	}
 
@@ -63,6 +63,7 @@ struct Buffer {
 		}
 
 		read_offset += skip_len;
+		return skip_len;
 	}
 
 	std::size_t reserve(std::size_t length) {

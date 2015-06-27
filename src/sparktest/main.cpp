@@ -23,26 +23,22 @@ int main() {
 void launch() try {
 	spark::Server server;
 	TestService test_service(server);
-	spark::BufferChain<1024> chain;
-	char foo[1022];
-	char bar = 'a';
+	spark::BufferChain<9> chain;
+	char foo[5];
+	
+	std::string test("abcdefghijklmnopqrstuvwxyz");
 
-	for(int i = 0; i < 1023; ++i) {
-		chain.write(&bar, sizeof(bar));
-	}
+	chain.write(test.c_str(), test.length());
 
-	char test = 'b';
-	chain.write(&test, 1);
+	char test2 = 'b';
+	chain.write(&test2, 1);
 
-
-	//spark::BufferChain<1023> chain2 = chain;
 	chain.read(foo, sizeof(foo));
-
-	auto buffers = chain.fetch_buffers(2);
-	//std::cout << std::string(foo, sizeof(foo));
-
+	std::cout << std::string(foo, sizeof(foo));
+	
+	auto buffers = chain.fetch_buffers(22);
 	for(auto& buffer : buffers) {
-		std::cout << std::string(buffer.first, 2);
+		std::cout << std::string(buffer.first, buffer.second);
 	}
 
 } catch(std::exception& e) {

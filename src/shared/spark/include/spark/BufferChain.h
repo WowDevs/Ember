@@ -130,16 +130,15 @@ public:
 
 		while(length) {
 			auto buffer = buffer_from_node(head);
-			auto size = buffer->size();
-
+			std::size_t read_size = BlockSize - buffer->read_offset;
+			
 			// guard against overflow - buffer may have more content than requested
-			if(size > length) {
-				size = length;
+			if(read_size > length) {
+				read_size = length;
 			}
-
-			buffers.emplace_back(buffer->buff.data() + buffer->read_offset, size);
-			length -= size;
-			std::cout << size << "\n";
+		
+			buffers.emplace_back(buffer->buff.data() + buffer->read_offset, read_size);
+			length -= read_size;
 			head = head->next;
 		}
 
@@ -153,7 +152,7 @@ public:
 
 		while(remaining) {
 			auto buffer = buffer_from_node(head);
-			remaining -= buffer->size();
+			remaining -= buffer->skip();
 
 			if(remaining) {
 				unlink_node(head);
