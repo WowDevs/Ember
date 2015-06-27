@@ -78,12 +78,7 @@ public:
 	}
 
 	~BufferChain() {
-		BufferChainNode* head;
-
-		while((head = root_.next) != &root_) {
-			unlink_node(head);
-			deallocate(buffer_from_node(head));
-		}
+		clear();
 	}
 
 	BufferChain& operator=(BufferChain&& rhs) { move(rhs); }
@@ -96,12 +91,12 @@ public:
 		std::size_t remaining = length;
 
 		while(remaining) {
-			auto head = buffer_from_node(root_.next);
-			remaining -= head->read(destination + length - remaining, remaining);
+			auto buffer = buffer_from_node(root_.next);
+			remaining -= buffer->read(destination + length - remaining, remaining);
 
 			if(remaining) {
 				unlink_node(root_.next);
-				deallocate(head);
+				deallocate(buffer);
 			}
 		}
 
@@ -152,11 +147,12 @@ public:
 
 		while(remaining) {
 			auto buffer = buffer_from_node(head);
-			remaining -= buffer->skip();
+			remaining -= buffer->skip(remaining);
 
 			if(remaining) {
 				unlink_node(head);
-				deallocate(node);
+				deallocate(buffer);
+				head = root_.next;
 			}
 		}
 
@@ -225,6 +221,17 @@ public:
 
 	void deallocate(Buffer<BlockSize>* buffer) const {
 		delete buffer; // todo, actual allocator
+	}
+
+	void clear() {
+		BufferChainNode* head;
+
+		while((head = root_.next) != &root_) {
+			unlink_node(head);
+			deallocate(buffer_from_node(head));
+		}
+
+		size_ = 0;
 	}
 };
 
