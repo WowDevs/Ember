@@ -8,6 +8,7 @@
 
 #include "TestService.h"
 #include <spark/BufferChain.h>
+#include <spark/BinaryDecoder.h>
 #include <spark/Server.h>
 #include <iostream>
 #include <string>
@@ -20,22 +21,23 @@ int main() {
 	launch();
 }
 
+struct C {
+	int a;
+	int b;
+};
+ 
 void launch() try {
 	spark::Server server;
 	TestService test_service(server);
-	spark::BufferChain<900> chain;
-	char foo[23];
-	
-	std::string test("abcdefghijklmnopqrstuvwxyz");
-	chain.write(test.c_str(), test.length());
-	chain.read(foo, sizeof(foo));
-	std::cout << std::string(foo, sizeof(foo));
-	auto buffers = chain.fetch_buffers(1, 2);
-
-	for(auto& buffer : buffers) {
-		std::cout << std::string(buffer.first, buffer.second);
-	}
-
+	spark::BufferChain<> chain;
+	spark::BinaryStream<spark::BufferChain<>> stream(chain);
+	C foo;
+	stream << C{ 5, 10 };
+	stream << C{ 10, 20 };
+	stream >> foo;
+	std::cout << foo.b;
+	stream >> foo;
+	std::cout << foo.b;
 } catch(std::exception& e) {
 	std::cout << e.what();
 }

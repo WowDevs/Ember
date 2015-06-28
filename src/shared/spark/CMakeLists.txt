@@ -15,6 +15,7 @@ add_library(spark
             include/spark/Types.h
             include/spark/BufferChain.h
             include/spark/BufferChainNode.h
+            include/spark/BinaryStream.h
 )
 
 target_include_directories(spark PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

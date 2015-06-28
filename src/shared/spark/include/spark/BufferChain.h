@@ -13,14 +13,13 @@
 #include <vector>
 #include <utility>
 #include <cstddef>
-#include <iostream>
 
 namespace ember { namespace spark {
 
 typedef std::pair<const char*, std::size_t> ConstRawBuffer;
 typedef std::pair<char*, std::size_t> RawBuffer;
 
-template<typename std::size_t BlockSize>
+template<typename std::size_t BlockSize = 1024>
 class BufferChain {
 	BufferChainNode root_;
 	std::size_t size_;
