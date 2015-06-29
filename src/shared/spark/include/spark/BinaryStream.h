@@ -9,6 +9,7 @@
 #pragma once
 
 #include <algorithm>
+#include <string>
 #include <type_traits>
 #include <cstdint>
 #include <cstddef>
