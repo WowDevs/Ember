@@ -20,7 +20,7 @@ class BinaryStream {
 	Buffer& buffer_;
 
 public:
-	BinaryStream(Buffer& source) : buffer_(source) {}
+	explicit BinaryStream(Buffer& source) : buffer_(source) {}
 
 	/**  Serialisation **/
 

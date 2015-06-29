@@ -8,7 +8,7 @@
 
 #include "TestService.h"
 #include <spark/BufferChain.h>
-#include <spark/BinaryDecoder.h>
+#include <spark/BinaryStream.h>
 #include <spark/Server.h>
 #include <iostream>
 #include <string>

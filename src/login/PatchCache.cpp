@@ -77,11 +77,13 @@ std::vector<PatchMeta> fetch(const std::string& path) {
 
     if(bfs::is_directory(dir)) {
 		for(auto& entry : boost::make_iterator_range(bfs::directory_iterator(dir))) {
-			if(entry.path().extension() != ".mpq") {
+			const auto& path = entry.path();
+
+			if(path.extension() != ".mpq") {
 				continue;
 			}
 
-			std::string name = entry.path().filename().string();
+			std::string name = path.filename().string();
 			
 			auto it = std::find_if(cached.begin(), cached.end(), [&](const PatchMeta& m) {
 				return name == m.file_meta.name;
@@ -89,7 +91,7 @@ std::vector<PatchMeta> fetch(const std::string& path) {
 
 			if(it == cached.end()) {
 				PatchMeta patch;
-				std::string rel_path = entry.path().relative_path().string();
+				std::string rel_path = path.relative_path().string();
 				patch.file_meta.name = std::move(name);
 				patch.file_meta.md5 = util::generate_md5(rel_path);
 				patch.file_meta.rel_path = std::move(rel_path);
