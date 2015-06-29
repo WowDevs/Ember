@@ -16,7 +16,7 @@
 
 namespace ember { namespace spark {
 
-typedef std::pair<const void*, std::size_t> ConstRawBuffer;
+typedef std::pair<const char*, std::size_t> ConstRawBuffer;
 typedef std::pair<char*, std::size_t> RawBuffer;
 
 template<typename std::size_t BlockSize = 1024>
@@ -97,13 +97,13 @@ public:
 	BufferChain(const BufferChain& rhs) { copy(rhs); }
 	BufferChain& operator=(const BufferChain& rhs) { copy(rhs); }
 
-	void read(void* destination, std::size_t length) {
+	void read(char* destination, std::size_t length) {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer read too large!");
 		std::size_t remaining = length;
 
 		while(remaining) {
 			auto buffer = buffer_from_node(root_.next);
-			remaining -= buffer->read(static_cast<char*>(destination) + length - remaining, remaining);
+			remaining -= buffer->read(destination + length - remaining, remaining);
 
 			if(remaining) {
 				unlink_node(root_.next);
@@ -114,14 +114,14 @@ public:
 		size_ -= length;
 	}
 
-	void copy(void* destination, std::size_t length) const {
+	void copy(const char* source, std::size_t length) const {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer copy too large!");
 		std::size_t remaining = length;
 		auto head = root_.next;
 
 		while(remaining) {
 			auto buffer = buffer_from_node(head);
-			remaining -= buffer->copy(static_cast<char*>(destination) + length - remaining, remaining);
+			remaining -= buffer->copy(destination + length - remaining, remaining);
 
 			if(remaining) {
 				head = head->next;
@@ -175,7 +175,7 @@ public:
 		size_ -= length;
 	}
 
-	void write(const void* source, std::size_t length) {
+	void write(const char* source, std::size_t length) {
 		std::size_t remaining = length;
 		BufferChainNode* tail = root_.prev;
 
@@ -190,7 +190,7 @@ public:
 				buffer = buffer_from_node(tail);
 			}
 
-			remaining -= buffer->write(static_cast<const char*>(source) + length - remaining, remaining);
+			remaining -= buffer->write(source + length - remaining, remaining);
 			tail = tail->next;
 		}
 
@@ -224,13 +224,11 @@ public:
 	}
 
 	RawBuffer tail() {
-		auto buffer = buffer_from_node(root_.next);
-		return { buffer->buff.data(), buffer->size() };
+		return { root_.next, buffer_from_node(root_.next)->size() };
 	}
 
 	void attach(Buffer<BlockSize>* buffer) {
 		link_tail_node(&buffer->node);
-		size_ += buffer->write_offset;
 	}
 
 	Buffer<BlockSize>* allocate() const {
