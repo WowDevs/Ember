@@ -89,10 +89,10 @@ public:
 		clear();
 	}
 
-	BufferChain& operator=(BufferChain&& rhs) { move(rhs); }
+	BufferChain& operator=(BufferChain&& rhs) { move(rhs); return *this;  }
 	BufferChain(BufferChain&& rhs) { move(rhs); }
 	BufferChain(const BufferChain& rhs) { copy(rhs); }
-	BufferChain& operator=(const BufferChain& rhs) { copy(rhs); }
+	BufferChain& operator=(const BufferChain& rhs) { copy(rhs); return *this;  }
 
 	void read(void* destination, std::size_t length) {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer read too large!");

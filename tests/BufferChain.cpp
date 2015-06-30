@@ -148,11 +148,45 @@ TEST(BufferChainTest, Copy) {
 }
 
 TEST(BufferChainTest, CopyChain) {
-	spark::BufferChain<32> chain, chain2;
+	spark::BufferChain<sizeof(int)> chain, chain2;
+	int foo = 5491;
+	int output;
 
+	chain.write(&foo, sizeof(int));
+	chain.write(&foo, sizeof(int));
+	ASSERT_EQ(sizeof(int) * 2, chain.size()) << "Chain size is incorrect";
+	ASSERT_EQ(0, chain2.size()) << "Chain size is incorrect";
+
+	chain2 = chain;
+	ASSERT_EQ(sizeof(int) * 2, chain.size()) << "Chain size is incorrect";
+	ASSERT_EQ(sizeof(int) * 2, chain2.size()) << "Chain size is incorrect";
+
+	chain.read(&output, sizeof(int));
+	ASSERT_EQ(sizeof(int), chain.size()) << "Chain size is incorrect";
+	ASSERT_EQ(sizeof(int) * 2, chain2.size()) << "Chain size is incorrect";
+
+	chain.clear();
+	ASSERT_EQ(0, chain.size()) << "Chain size is incorrect";
+	ASSERT_EQ(sizeof(int) * 2, chain2.size()) << "Chain size is incorrect";
+
+	
+	chain2.read(&output, sizeof(int));
+	ASSERT_EQ(foo, output) << "Chain output is incorrect";
 }
 
 TEST(BufferChainTest, MoveChain) {
 	spark::BufferChain<32> chain, chain2;
+	int foo = 23113;
 
+	chain.write(&foo, sizeof(int));
+	ASSERT_EQ(sizeof(int), chain.size()) << "Chain size is incorrect";
+	ASSERT_EQ(0, chain2.size()) << "Chain size is incorrect";
+
+	chain2 = std::move(chain);
+	ASSERT_EQ(0, chain.size()) << "Chain size is incorrect";
+	ASSERT_EQ(sizeof(int), chain2.size()) << "Chain size is incorrect";
+
+	int output;
+	chain2.read(&output, sizeof(int));
+	ASSERT_EQ(foo, output) << "Chain output is incorrect";
 }
