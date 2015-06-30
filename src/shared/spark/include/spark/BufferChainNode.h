@@ -26,6 +26,11 @@ struct Buffer {
 	std::size_t write_offset = 0;
 	BufferChainNode node;
 
+	void reset() {
+		read_offset = 0;
+		write_offset = 0;
+	}
+
 	std::size_t write(const char* source, std::size_t length) {
 		std::size_t write_len = BlockSize - write_offset;
 
@@ -52,6 +57,11 @@ struct Buffer {
 	std::size_t read(char* destination, std::size_t length) {
 		std::size_t read_len = copy(destination, length);
 		read_offset += read_len;
+
+		if(read_offset == write_offset) {
+			reset();
+		}
+
 		return read_len;
 	}
 
@@ -63,6 +73,11 @@ struct Buffer {
 		}
 
 		read_offset += skip_len;
+
+		if(read_offset == write_offset) {
+			reset();
+		}
+
 		return skip_len;
 	}
 

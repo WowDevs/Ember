@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Ember
+ * Copyright (c) 2015 Ember
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +9,9 @@
 #include <spark/BufferChain.h>
 #include <gtest/gtest.h>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace spark = ember::spark;
 
@@ -47,7 +50,6 @@ TEST(BufferChainTest, ReadWriteConsistency) {
 	chain.read(text_out.get(), sizeof(text));
 	chain.read(&num_out, sizeof(int));
 
-	std::memcmp(text, text_out.get(), sizeof(text));
 	ASSERT_EQ(num, num_out) << "Read produced incorrect result";
 	ASSERT_STREQ(text, text_out.get()) << "Read produced incorrect result";
 	ASSERT_EQ(0, chain.size()) << "Chain should be empty";

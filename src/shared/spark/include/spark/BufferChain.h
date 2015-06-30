@@ -43,9 +43,13 @@ class BufferChain {
 	}
 
 	void move(BufferChain& rhs) {
+		clear(); //clear our current blocks rather than swapping them
+
 		size_ = rhs.size_;
 		root_.next = rhs.root_.next;
 		root_.prev = rhs.root_.prev;
+		root_.next->prev = &root_;
+		root_.prev->next = &root_;
 		rhs.size_ = 0;
 		rhs.root_.next = &rhs.root_;
 		rhs.root_.prev = &rhs.root_;
@@ -90,9 +94,15 @@ public:
 	}
 
 	BufferChain& operator=(BufferChain&& rhs) { move(rhs); return *this;  }
-	BufferChain(BufferChain&& rhs) { move(rhs); }
+
+	BufferChain(BufferChain&& rhs) { 
+		root_.next = &root_;
+		root_.prev = &root_;
+		move(rhs); 
+	}
+
 	BufferChain(const BufferChain& rhs) { copy(rhs); }
-	BufferChain& operator=(const BufferChain& rhs) { copy(rhs); return *this;  }
+	BufferChain& operator=(const BufferChain& rhs) { clear(); copy(rhs); return *this;  }
 
 	void read(void* destination, std::size_t length) {
 		BOOST_ASSERT_MSG(length <= size_, "Chained buffer read too large!");
