@@ -16,9 +16,6 @@
 
 namespace ember { namespace spark {
 
-typedef std::pair<const void*, std::size_t> ConstRawBuffer;
-typedef std::pair<char*, std::size_t> RawBuffer;
-
 template<typename std::size_t BlockSize = 1024>
 class BufferChain {
 	BufferChainNode root_;
@@ -69,11 +66,11 @@ class BufferChain {
 		}
 	}
 	
-	void offset_buffers(std::vector<RawBuffer>& buffers, std::size_t offset) {
+	void offset_buffers(std::vector<Buffer<BlockSize>*>& buffers, std::size_t offset) {
 		for(auto i = buffers.begin(); i != buffers.end();) {
-			if(i->second > offset) {
-				i->first += offset;
-				i->second -= offset;
+			if((*i)->size() > offset) {
+				(*i)->read_offset += offset;
+				(*i)->write_offset -= offset;
 				break;
 			} else {
 				buffers.erase(i);
@@ -129,10 +126,10 @@ public:
 		}
 	}
 
-	std::vector<RawBuffer> fetch_buffers(std::size_t length, std::size_t offset = 0) {
+	std::vector<Buffer<BlockSize>*> fetch_buffers(std::size_t length, std::size_t offset = 0) {
 		std::size_t total = length + offset;
 		BOOST_ASSERT_MSG(total <= size_, "Chained buffer fetch too large!");
-		std::vector<RawBuffer> buffers;
+		std::vector<Buffer<BlockSize>*> buffers;
 		auto head = root_.next;
 
 		while(total) {
@@ -144,7 +141,7 @@ public:
 				read_size = total;
 			}
 		
-			buffers.emplace_back(buffer->buff.data() + buffer->read_offset, read_size);
+			buffers.emplace_back(buffer);
 			total -= read_size;
 			head = head->next;
 		}
@@ -223,9 +220,9 @@ public:
 		return size_;
 	}
 
-	RawBuffer tail() {
+	Buffer<BlockSize>* tail() {
 		auto buffer = buffer_from_node(root_.next);
-		return { buffer->buff.data(), buffer->size() };
+		return buffer;
 	}
 
 	void attach(Buffer<BlockSize>* buffer) {

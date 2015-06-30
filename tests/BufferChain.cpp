@@ -68,8 +68,8 @@ TEST(BufferChainTest, ReserveFetchConsistency) {
 	std::size_t offset = 0;
 
 	for(auto& buffer : buffers) {
-		std::memcpy(buffer.first, text + offset, buffer.second);
-		offset += buffer.second;
+		std::memcpy(buffer->buff.data(), text + offset, buffer->size());
+		offset += buffer->size();
 
 		if(offset > text_len || !offset) {
 			break;
@@ -134,7 +134,7 @@ TEST(BufferChainTest, RetrieveTail) {
 	chain.write(text.data(), text.length());
 
 	auto tail = chain.tail();
-	ASSERT_EQ(0, std::memcmp(text.data(), tail.first, text.length())) << "Tail data is incorrect";
+	ASSERT_EQ(0, std::memcmp(text.data(), tail->buff.data(), text.length())) << "Tail data is incorrect";
 }
 
 TEST(BufferChainTest, Copy) {
