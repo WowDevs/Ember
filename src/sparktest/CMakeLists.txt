@@ -10,13 +10,16 @@ set(EXECUTABLE_HDR
     Player.h
     TestService.h
     TestProtocol.h
-    PlayerDamage.h
+    protocol/PlayerDamage.h
+    protocol/PlayerHeal.h
     )
 
 set(EXECUTABLE_SRC
     main.cpp
     Player.cpp
     TestService.cpp
+    protocol/PlayerDamage.cpp
+    protocol/PlayerHeal.cpp
     )
 
 include_directories(${CMAKE_SOURCE_DIR}/src)

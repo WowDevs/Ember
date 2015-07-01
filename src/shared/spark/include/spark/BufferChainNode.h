@@ -20,7 +20,7 @@ struct BufferChainNode {
 };
 
 template<typename std::size_t BlockSize>
-struct Buffer {
+struct BufferBlock {
 	std::array<char, BlockSize> buff;
 	std::size_t read_offset = 0;
 	std::size_t write_offset = 0;

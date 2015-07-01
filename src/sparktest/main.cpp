@@ -9,6 +9,7 @@
 #include "TestService.h"
 #include <spark/BufferChain.h>
 #include <spark/BinaryStream.h>
+#include "protocol/PlayerHeal.h"
 #include <spark/Server.h>
 #include <iostream>
 #include <string>
@@ -28,16 +29,8 @@ struct C {
  
 void launch() try {
 	spark::Server server;
-	TestService test_service(server);
-	spark::BufferChain<> chain;
-	spark::BinaryStream<spark::BufferChain<>> stream(chain);
-	C foo;
-	stream << C{ 5, 10 };
-	stream << C{ 10, 20 };
-	stream >> foo;
-	std::cout << foo.b;
-	stream >> foo;
-	std::cout << foo.b;
+
+	
 } catch(std::exception& e) {
 	std::cout << e.what();
 }

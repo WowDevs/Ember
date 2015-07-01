@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <spark/Buffer.h>
 #include <algorithm>
 #include <string>
 #include <type_traits>
@@ -16,7 +17,6 @@
 
 namespace ember { namespace spark{
 
-template<typename Buffer>
 class BinaryStream {
 	Buffer& buffer_;
 

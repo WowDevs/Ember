@@ -9,6 +9,7 @@
 #pragma once
 
 #include <spark/BufferChainNode.h>
+#include <spark/Buffer.h>
 #include <boost/assert.hpp>
 #include <vector>
 #include <utility>
@@ -17,7 +18,7 @@
 namespace ember { namespace spark {
 
 template<typename std::size_t BlockSize = 1024>
-class BufferChain {
+class BufferChain final : public Buffer {
 	BufferChainNode root_;
 	std::size_t size_;
 
@@ -34,12 +35,14 @@ class BufferChain {
 		prev->next = next;
 	}
 
-	Buffer<BlockSize>* buffer_from_node(BufferChainNode* node) const {
-		return reinterpret_cast<Buffer<BlockSize>*>(std::size_t(node) - offsetof(Buffer<BlockSize>, node));
+	BufferBlock<BlockSize>* buffer_from_node(BufferChainNode* node) const {
+		return reinterpret_cast<BufferBlock<BlockSize>*>(std::size_t(node)
+			- offsetof(BufferBlock<BlockSize>, node));
 	}
 
-	Buffer<BlockSize>* buffer_from_node(const BufferChainNode* node) const {
-		return reinterpret_cast<Buffer<BlockSize>*>(std::size_t(node) - offsetof(Buffer<BlockSize>, node));
+	BufferBlock<BlockSize>* buffer_from_node(const BufferChainNode* node) const {
+		return reinterpret_cast<BufferBlock<BlockSize>*>(std::size_t(node)
+			- offsetof(BufferBlock<BlockSize>, node));
 	}
 
 	void move(BufferChain& rhs) {
@@ -70,7 +73,7 @@ class BufferChain {
 		}
 	}
 	
-	void offset_buffers(std::vector<Buffer<BlockSize>*>& buffers, std::size_t offset) {
+	void offset_buffers(std::vector<BufferBlock<BlockSize>*>& buffers, std::size_t offset) {
 		for(auto i = buffers.begin(); i != buffers.end();) {
 			if((*i)->size() > offset) {
 				(*i)->read_offset += offset;
@@ -94,13 +97,7 @@ public:
 	}
 
 	BufferChain& operator=(BufferChain&& rhs) { move(rhs); return *this;  }
-
-	BufferChain(BufferChain&& rhs) { 
-		root_.next = &root_;
-		root_.prev = &root_;
-		move(rhs); 
-	}
-
+	BufferChain(BufferChain&& rhs) {  move(rhs); }
 	BufferChain(const BufferChain& rhs) { copy(rhs); }
 	BufferChain& operator=(const BufferChain& rhs) { clear(); copy(rhs); return *this;  }
 
@@ -136,10 +133,10 @@ public:
 		}
 	}
 
-	std::vector<Buffer<BlockSize>*> fetch_buffers(std::size_t length, std::size_t offset = 0) {
+	std::vector<BufferBlock<BlockSize>*> fetch_buffers(std::size_t length, std::size_t offset = 0) {
 		std::size_t total = length + offset;
 		BOOST_ASSERT_MSG(total <= size_, "Chained buffer fetch too large!");
-		std::vector<Buffer<BlockSize>*> buffers;
+		std::vector<BufferBlock<BlockSize>*> buffers;
 		auto head = root_.next;
 
 		while(total) {
@@ -187,7 +184,7 @@ public:
 		BufferChainNode* tail = root_.prev;
 
 		while(remaining) {
-			Buffer<BlockSize>* buffer;
+			BufferBlock<BlockSize>* buffer;
 
 			if(tail == &root_) {
 				buffer = allocate();
@@ -209,7 +206,7 @@ public:
 		BufferChainNode* tail = root_.prev;
 
 		while(remaining) {
-			Buffer<BlockSize>* buffer;
+			BufferBlock<BlockSize>* buffer;
 
 			if(tail == &root_) {
 				buffer = allocate();
@@ -230,21 +227,21 @@ public:
 		return size_;
 	}
 
-	Buffer<BlockSize>* tail() {
+	BufferBlock<BlockSize>* tail() {
 		auto buffer = buffer_from_node(root_.next);
 		return buffer;
 	}
 
-	void attach(Buffer<BlockSize>* buffer) {
+	void attach(BufferBlock<BlockSize>* buffer) {
 		link_tail_node(&buffer->node);
 		size_ += buffer->write_offset;
 	}
 
-	Buffer<BlockSize>* allocate() const {
-		return new Buffer<BlockSize>(); // todo, actual allocator
+	BufferBlock<BlockSize>* allocate() const {
+		return new BufferBlock<BlockSize>(); // todo, actual allocator
 	}
 
-	void deallocate(Buffer<BlockSize>* buffer) const {
+	void deallocate(BufferBlock<BlockSize>* buffer) const {
 		delete buffer; // todo, actual allocator
 	}
 

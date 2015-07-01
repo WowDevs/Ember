@@ -14,7 +14,7 @@ namespace spark = ember::spark;
 
 TEST(BufferTest, Size) {
 	const int iterations = 5;
-	spark::Buffer<sizeof(int) * iterations> buffer;
+	spark::BufferBlock<sizeof(int) * iterations> buffer;
 	int foo = 24221;
 	std::size_t written = 0;
 
@@ -33,7 +33,7 @@ TEST(BufferTest, Size) {
 
 TEST(BufferTest, ReadWriteConsistency) {
 	const char text[] = "The quick brown fox jumps over the lazy dog";
-	spark::Buffer<sizeof(text)> buffer;
+	spark::BufferBlock<sizeof(text)> buffer;
 
 	std::size_t written = buffer.write(text, sizeof(text));
 	ASSERT_EQ(sizeof(text), written) << "Incorrect write size";
@@ -51,7 +51,7 @@ TEST(BufferTest, ReadWriteConsistency) {
 
 TEST(BufferTest, Skip) {
 	const char text[] = "The quick brown fox jumps over the lazy dog";
-	spark::Buffer<sizeof(text)> buffer;
+	spark::BufferBlock<sizeof(text)> buffer;
 
 	buffer.write(text, sizeof(text));
 	auto text_out = std::make_unique<char[]>(sizeof(text));

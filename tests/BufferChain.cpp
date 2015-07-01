@@ -114,7 +114,7 @@ TEST(BufferChainTest, Clear) {
 
 TEST(BufferChainTest, AttachTail) {
 	spark::BufferChain<32> chain;
-	spark::Buffer<32>* buffer = chain.allocate();
+	spark::BufferBlock<32>* buffer = chain.allocate();
 
 	std::string text("This is a string that is almost certainly longer than 32 bytes");
 	std::size_t written = buffer->write(text.c_str(), text.length());

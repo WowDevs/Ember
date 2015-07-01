@@ -9,29 +9,22 @@
 #include <spark/Result.h>
 #include <spark/Types.h>
 #include <spark/Link.h>
-#include "PlayerDamage.h"
 #include <cstdint>
 
 namespace ember {
 
 class Player {
 	std::uint32_t id_;
-	std::uint32_t /*spark::ServerID*/ server_id_;
+	std::uint32_t server_id_;
 
 	std::uint32_t health_ = 100;
 
 public:
-	Player();
+	void cast_heal(std::uint32_t player_id, std::uint32_t amount);
+	void attack(std::uint32_t player_id, std::uint32_t amount);
 
-	spark::Result Player::DamageHandler(const spark::Link& link, const PlayerDamage* damage);
-
-	std::uint32_t /*spark::ServerID*/ server_id() {
-		return server_id_;
-	}
-
-	std::uint32_t id() {
-		return id_;
-	}
+	spark::Result damage_handler(const spark::Link& link, const PlayerDamage* msg);
+	spark::Result heal_handler(const spark::Link& link, const PlayerHeal* msg);
 };
 
 } // ember
